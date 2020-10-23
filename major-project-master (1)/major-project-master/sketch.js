@@ -205,8 +205,8 @@ class Enemy {
     for (let i=0; i<this.enemyArray.length; i++) {
       this.enemyArray[i].update();
       this.enemyArray[i].display();
-      if ((this.enemyArray[i].x + cellWidth /4 ) - (this.x * this.height) <= 1) {
-        if ((this.enemyArray[i].y + cellWidth /4 ) - (this.y * this.width) <= 1) {
+      if ((this.enemyArray[i].x + cellWidth /4 ) - (this.x * this.width) <= 1) {
+        if ((this.enemyArray[i].y + cellWidth /4 ) - (this.y * this.height) <= 1) {
           this.enemyArray[i].spawnBullet();
           console.log(this.enemyArray[i].x + cellWidth /4 );
           console.log(this.x * this.height);
@@ -530,7 +530,7 @@ class Character {
 
     //bullet movement
     for (let i=0; i<this.bulletArray.length; i++) {
-      this.bulletArray[i].moveUp();
+      this.bulletArray[i].moveDown();
       this.bulletArray[i].display();
     }
   }
