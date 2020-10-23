@@ -82,13 +82,17 @@ function setup() {
   canonWidth = cellWidth*3;
   canonHeight = cellHeight*3;
 
-  // player = new Character(width/2, height-50);
+  canonX = width/2;
+  canonY = height-50;
+
+  //player = new Character(canonX, canonY, mouseX, mouseY);
 
 }
 
 function draw() {
 
   background(0);
+  //player = new Character(canonX, canonY, mouseX, mouseY);
   findPath();
   displayPath();
   makePathForEnemy();
@@ -101,11 +105,17 @@ function draw() {
   displayLevel();
   displayScore();
   changeDisplay();
-  enemy.spawnEnemies();
+  //enemy.spawnEnemies();
   enemy.attack();
-  enemy.collisionCheck();
-  // enemy.update();
-  // enemy.display();
+  enemy.enemyUpdate();
+  // enemy.nearBy();
+  // enemy.keyPressed();
+  // enemy.collisionCheck();
+  // player.update();
+  // player.display();
+  // player.moveRectangle();
+
+  
 }
 
 class Enemy {
@@ -181,25 +191,45 @@ class Enemy {
       this.isEnemyAlive = false;
     }
   }
-  spawnEnemies() {
-    this.enemyArray.push(new Character(width/2, height-50));
-  }
-  collisionCheck(otherBall) {
-    let distanceApart = dist(this.x, this.y, otherBall.x, otherBall.y);
-    let sumOfRadii = this.radius + otherBall.radius;
-    if (distanceApart <= sumOfRadii) {
-      this.fillColor = "red";
 
-      let tempDx = this.dx;
-      let tempDy = this.dy;
+  enemyUpdate() {
+    //player movement
 
-      this.dx = otherBall.dx;
-      this.dy = otherBall.dy;
-
-      otherBall.dx = tempDx;
-      otherBall.dy = tempDy;
+    //bullet movement
+    for (let i=0; i<this.enemyArray.length; i++) {
+      this.enemyArray[i].update();
+      this.enemyArray[i].display();
+      if ((canonX +5 ) - (this.x * this.width) <= 0) {
+        this.enemyArray[i].spawnBullet();
+      } 
     }
   }
+
+  nearBy() {
+    if ((canonX ) - (this.x * this.width) <= 0) {
+      console.log("abdul dead");
+    }
+  }
+
+  spawnEnemies() {
+    this.enemyArray.push(new Character(canonX, canonY, cellWidth, cellHeight));
+  }
+  // collisionCheck(otherBall) {
+  //   let distanceApart = dist(this.x, this.y, otherBall.x, otherBall.y);
+  //   let sumOfRadii = this.radius + otherBall.radius;
+  //   if (distanceApart <= sumOfRadii) {
+  //     this.fillColor = "red";
+
+  //     let tempDx = this.dx;
+  //     let tempDy = this.dy;
+
+  //     this.dx = otherBall.dx;
+  //     this.dy = otherBall.dy;
+
+  //     otherBall.dx = tempDx;
+  //     otherBall.dy = tempDy;
+  //   }
+  // }
   
   attack() {
     //if (hit) {
@@ -281,6 +311,12 @@ function mouseClicked() {
   console.log(enemy.health);
 
   enemy.move();
+  canonX = mouseX;
+  canonY = mouseY;
+  for (let i=0; i<level; i++) {
+    console.log(level);
+    enemy.spawnEnemies();
+  }
 }
 
 // display grid
@@ -452,27 +488,27 @@ function makePathForEnemy() {
 
 
 
-function keyPressed() {
-  if (key === " ") {
-    enemy.spawnBullet();
-  }
-  if (key === "a" || key === "d" || key === "w" || key === "s") {
-    enemy.handleKeys();
-  } 
-}
 
 
 class Character {
-  constructor(x, y) {
+  constructor(x, y, mouseX, mouseY) {
     this.x = x;
     this.y = y;
+    this.mouseX = mouseX;
+    this.mouseY = mouseY;
     this.size = 25;
     this.bulletArray = [];
   }
 
   display() {
     fill("black");
-    rect(this.x, this.y, this.size, this.size);
+    // rectMode(CENTER);
+    rect(this.x, this.y, this.mouseX, this.mouseY);
+    noFill();
+    ellipseMode(CENTER);
+    // ellipseMode(CORNER);
+    ellipse(this.x, this.y, cellWidth*2);
+    console.log("canon");
   }
 
   update() {
@@ -487,21 +523,7 @@ class Character {
 
   spawnBullet() {
     this.bulletArray.push(new Bullet(this.x + this.size/2, this.y));
-  }
-
-  handleKeys() {
-    if (key === "a") {
-      this.x -= 10;
-    }
-    if (key === "d") {
-      this.x += 10;
-    }
-    if (key === "w") {
-      this.y -= 10;
-    }
-    if (key === "s") {
-      this.y += 10;
-    }
+    console.log("you");
   }
 
 }
@@ -515,11 +537,13 @@ class Bullet {
 
   move() {
     this.y += this.dy;
+    console.log("move");
   }
 
   display() {
     fill("red");
     noStroke();
     circle(this.x, this.y, 5);
+    console.log("bullet");
   }
 }
