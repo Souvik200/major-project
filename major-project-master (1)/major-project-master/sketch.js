@@ -46,8 +46,14 @@ let x, y, isDragging;
 let score = 0;
 let level = 1;
 
+let numberOfguns = 1;
 let player;
 let hit = false;
+
+let canonX;
+let canonY;
+
+let canonNumber;
 
 function preload() {
   grid = loadStrings("assets/level1.txt");
@@ -105,7 +111,7 @@ function draw() {
   displayLevel();
   displayScore();
   changeDisplay();
-  //enemy.spawnEnemies();
+  //enemy.spawnCanons();
   enemy.attack();
   enemy.enemyUpdate();
   // enemy.nearBy();
@@ -199,19 +205,23 @@ class Enemy {
     for (let i=0; i<this.enemyArray.length; i++) {
       this.enemyArray[i].update();
       this.enemyArray[i].display();
-      if ((canonX +5 ) - (this.x * this.width) <= 0) {
-        this.enemyArray[i].spawnBullet();
+      if ((this.enemyArray[i].x + cellWidth /4 ) - (this.x * this.height) <= 1) {
+        if ((this.enemyArray[i].y + cellWidth /4 ) - (this.y * this.width) <= 1) {
+          this.enemyArray[i].spawnBullet();
+          console.log(this.enemyArray[i].x + cellWidth /4 );
+          console.log(this.x * this.height);
+        }
       } 
     }
   }
 
-  nearBy() {
-    if ((canonX ) - (this.x * this.width) <= 0) {
-      console.log("abdul dead");
-    }
-  }
+  // nearBy() {
+  //   if ((canonX ) - (this.x * this.width) <= 0) {
+  //     // console.log("abdul dead");
+  //   }
+  // }
 
-  spawnEnemies() {
+  spawnCanons() {
     this.enemyArray.push(new Character(canonX, canonY, cellWidth, cellHeight));
   }
   // collisionCheck(otherBall) {
@@ -233,7 +243,7 @@ class Enemy {
   
   attack() {
     //if (hit) {
-    console.log("yes it worked");
+    // console.log("yes it worked");
     //}
   }
 }
@@ -311,11 +321,12 @@ function mouseClicked() {
   console.log(enemy.health);
 
   enemy.move();
-  canonX = mouseX;
-  canonY = mouseY;
-  for (let i=0; i<level; i++) {
-    console.log(level);
-    enemy.spawnEnemies();
+  canonX = cellX * cellWidth;
+  canonY = cellY * cellHeight;
+  canonNumber = cellX * cellWidth ;
+  for (let i=0; i<numberOfguns; i++) {
+    console.log(numberOfguns);
+    enemy.spawnCanons();
   }
 }
 
@@ -360,6 +371,7 @@ class Pathfinder {
   }
   // create and color rects to use when display grid
   displayGrid(color) {
+    rectMode(CORNER);
     strokeWeight(0);
     fill(color);
     if (this.wall) {
@@ -502,13 +514,15 @@ class Character {
 
   display() {
     fill("black");
-    // rectMode(CENTER);
-    rect(this.x, this.y, this.mouseX, this.mouseY);
-    noFill();
+    rectMode(CENTER);
+    text("", this.x, this.y, canonNumber);
+    rect(this.x + cellWidth/2, this.y + cellHeight/2, this.mouseX, this.mouseY);
+    fill(255, 255, 255, 100);
+    // noFill();
     ellipseMode(CENTER);
     // ellipseMode(CORNER);
-    ellipse(this.x, this.y, cellWidth*2);
-    console.log("canon");
+    ellipse(this.x + cellWidth/2, this.y + cellHeight/2, cellWidth*3);
+    console.log(canonNumber);
   }
 
   update() {
@@ -516,14 +530,14 @@ class Character {
 
     //bullet movement
     for (let i=0; i<this.bulletArray.length; i++) {
-      this.bulletArray[i].move();
+      this.bulletArray[i].moveUp();
       this.bulletArray[i].display();
     }
   }
 
   spawnBullet() {
     this.bulletArray.push(new Bullet(this.x + this.size/2, this.y));
-    console.log("you");
+    // console.log("you");
   }
 
 }
@@ -533,17 +547,26 @@ class Bullet {
     this.x = x;
     this.y = y;
     this.dy = -5;
+    this.dx = -5;
   }
 
-  move() {
+  moveUp() {
     this.y += this.dy;
-    console.log("move");
+  }
+  moveDown() {
+    this.y -= this.dy;
+  }
+  moveRight() {
+    this.y -= this.dx;
+  }
+  moveLeft() {
+    this.y += this.dx;
   }
 
   display() {
     fill("red");
     noStroke();
     circle(this.x, this.y, 5);
-    console.log("bullet");
+    // console.log("bullet");
   }
 }
